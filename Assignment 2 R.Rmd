@@ -24,13 +24,16 @@ here is my snippet of code used for data importing:
 #For fang_et_al_genotypes.txt file:
 
 ```{r}
-library(tidyverse)
+## Importing data
+#For fang_et_al_genotypes.txt file:
 fang <- read_tsv("./fang_et_al_genotypes.txt")
 print(fang)
 ```
+
 ## Data Inspection
 here is my snippet of code used for data inspection:
 ```{r}
+
 head(fang)
 str(fang)
 summary(fang)
@@ -50,8 +53,10 @@ cat("Size of the file:", file_size_fang, "bytes\n")
 snp <- read_tsv("./snp_position.txt")
 print(snp)
 ```
+
 ## Data Inspection
 here is my snippet of code used for data inspection:
+
 ```{r}
 head(snp)
 str(snp)
@@ -71,6 +76,7 @@ cat("Size of the file:", file_size_snp, "bytes\n")
 here is my snippet of code used for data processing:
 
 # Organize and Sort the data
+
 ```{r}
 snp_final <- select(snp, SNP_ID, Chromosome, Position)
 snp_sort <- arrange(snp_final, Position)
@@ -84,10 +90,26 @@ teosinte<- filter(fang, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
 transpose_maize <- t(maize)
 transpose_teosinte <- t(teosinte)
 # Final data for maize and teosinte
+
+snp_final <- select(snp, SNP_ID, Chromosome, Position)
+snp_sort <- arrange(snp_final, Position)
+maize <- filter(fang_et_al, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
+teosinte<- filter(fang_et_al, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
+```
+
+# Organize and Transpose the data
+```{r}
+#Rename the first column in SNP file to merge 
+rename(snp_sort, Sample_ID = SNP_ID) -> snp_f
+#Transposing the files
+transpose_maize <- t(maize)
+transpose_teosinte <- t(teosinte)
+#Final data for maize and teosinte
 maize_final<- data.frame(SNP_ID=rownames(transpose_maize), transpose_maize, row.names=NULL, check.names=FALSE)
 teosinte_final <- data.frame(SNP_ID=rownames(transpose_teosinte), transpose_teosinte, row.names=NULL, check.names=FALSE) 
 ```
 
+<<<<<<< HEAD
 #ver se deixo ou nao
 maize_snp <- merge( snp_final, maize_final, by="SNP_ID", all=TRUE)
 teosinte_snp <- merge( snp_final, teosinte_final, by="SNP_ID", all=TRUE)
@@ -436,4 +458,3 @@ for (file in files_to_move) {
   file.rename(file, paste0("plots/", file))
 }
 ```
-
