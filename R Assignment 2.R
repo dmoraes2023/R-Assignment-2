@@ -1,38 +1,35 @@
 ---
-title: "Assignment 2 R"
+  title: "Assignment 2 R"
 author: "Daniel Moraes"
 date: "2024-03-06"
 output: html_document
 ---
-
+  
 ## R Assignment 2
-
+  
 ## Part I: Data Inspection and Data Processing
-
+  
 # Load packages
-
-```{r}
+  
 library(dbplyr)
 library(plyr)
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
-```
 
 ## Importing data
-here is my snippet of code used for data importing:
-#For fang_et_al_genotypes.txt file:
-
-```{r}
+# Here is my snippet of code used for data importing:
+  #For fang_et_al_genotypes.txt file:
+  
+ #
 ## Importing data
 #For fang_et_al_genotypes.txt file:
 fang <- read_tsv("./fang_et_al_genotypes.txt")
 print(fang)
-```
 
 ## Data Inspection
-here is my snippet of code used for data inspection:
-```{r}
+# Here is my snippet of code used for data inspection:
+
 
 head(fang)
 str(fang)
@@ -46,18 +43,17 @@ file_size_fang <- file_info$size
 
 # Print the size of the file
 cat("Size of the file:", file_size_fang, "bytes\n")
-```
+
 
 #For snp_position.txt file:
 ```{r}
 snp <- read_tsv("./snp_position.txt")
 print(snp)
-```
 
 ## Data Inspection
 here is my snippet of code used for data inspection:
-
-```{r}
+  
+ #
 head(snp)
 str(snp)
 summary(snp)
@@ -73,19 +69,18 @@ cat("Size of the file:", file_size_snp, "bytes\n")
 ```
 
 ## Data Processing
-here is my snippet of code used for data processing:
-
-# Organize and Sort the data
-
-```{r}
+#here is my snippet of code used for data processing:
+  
+  # Organize and Sort the data
+  
+ #
 snp_final <- select(snp, SNP_ID, Chromosome, Position)
 snp_sort <- arrange(snp_final, Position)
 maize <- filter(fang, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
 teosinte<- filter(fang, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
-```
 
 # Organize and Transpose the data
-```{r}
+
 # Transposing the files
 transpose_maize <- t(maize)
 transpose_teosinte <- t(teosinte)
@@ -95,10 +90,10 @@ snp_final <- select(snp, SNP_ID, Chromosome, Position)
 snp_sort <- arrange(snp_final, Position)
 maize <- filter(fang_et_al, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
 teosinte<- filter(fang_et_al, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
-```
+
 
 # Organize and Transpose the data
-```{r}
+
 #Rename the first column in SNP file to merge 
 rename(snp_sort, Sample_ID = SNP_ID) -> snp_f
 #Transposing the files
@@ -107,10 +102,9 @@ transpose_teosinte <- t(teosinte)
 #Final data for maize and teosinte
 maize_final<- data.frame(SNP_ID=rownames(transpose_maize), transpose_maize, row.names=NULL, check.names=FALSE)
 teosinte_final <- data.frame(SNP_ID=rownames(transpose_teosinte), transpose_teosinte, row.names=NULL, check.names=FALSE) 
-```
 
 # Organize and Merge the data
-```{r}
+
 # Merging
 maize_snp<- merge(snp_final, maize_final)
 teosinte_snp <- merge(snp_final, teosinte_final)
@@ -125,10 +119,9 @@ for(i in 1:10){
   data <- filter(teosinte_snp, Chromosome == i)
   write.csv(data, paste("teosinte_chr",i,".csv",sep=""),row.names=F)
 }
-```
 
 # Load the data from R repository-maize
-```{r}
+
 # Load the data from R repository
 maize_chr1 <- read.csv("maize_chr1.csv")
 maize_chr2 <- read.csv("maize_chr2.csv")
@@ -140,10 +133,9 @@ maize_chr7 <- read.csv("maize_chr7.csv")
 maize_chr8 <- read.csv("maize_chr8.csv")
 maize_chr9 <- read.csv("maize_chr9.csv")
 maize_chr10 <- read.csv("maize_chr10.csv")
-```
 
 # Load the data from R repository-teosinte
-```{r}
+
 # Load the data from R repository
 teosinte_chr1 <- read.csv("teosinte_chr1.csv")
 teosinte_chr2 <- read.csv("teosinte_chr2.csv")
@@ -155,10 +147,9 @@ teosinte_chr7 <- read.csv("teosinte_chr7.csv")
 teosinte_chr8 <- read.csv("teosinte_chr8.csv") 
 teosinte_chr9 <- read.csv("teosinte_chr9.csv")
 teosinte_chr10 <- read.csv("teosinte_chr10.csv")
-```
 
 # Increasing files- maize
-```{r}
+
 # Maize- 1 to 10
 data <- arrange(maize_chr1, Position) 
 write.csv(data, paste("maize_inc_1",".csv",sep=""),row.names=F)
@@ -180,10 +171,9 @@ data <- arrange(maize_chr9, Position)
 write.csv(data, paste("maize_inc_9",".csv",sep=""),row.names=F)
 data <- arrange(maize_chr10, Position) 
 write.csv(data, paste("maize_inc_10",".csv",sep=""),row.names=F)
-```
 
 # Decreasing files- maize
-```{r}
+
 # Maize- 1 to 10 
 data <- arrange(maize_chr1, desc(Position)) 
 data1 <- data.frame(sapply(data,function(x) {x <- gsub("?","-",x,fixed=TRUE)}))
@@ -224,10 +214,9 @@ write.csv(data1, paste("maize_dec_9",".csv",sep=""),row.names=F)
 data <- arrange(maize_chr10, desc(Position)) 
 data1 <- data.frame(sapply(data,function(x) {x <- gsub("?","-",x,fixed=TRUE)}))
 write.csv(data1, paste("maize_dec_10",".csv",sep=""),row.names=F)
-```
 
 # Organizing the increasing and decreasing files in a folder called maize
-```{r}
+
 # Create the maize folder
 if (!file.exists("maize")) {
   dir.create("maize")
@@ -238,10 +227,9 @@ for (i in 1:10) {
   file.rename(paste0("maize_inc_", i, ".csv"), paste0("maize/maize_inc_", i, ".csv"))
   file.rename(paste0("maize_dec_", i, ".csv"), paste0("maize/maize_dec_", i, ".csv"))
 }
-```
 
 # Increasing files- teosinte
-```{r}
+
 # Teosinte- 1 to 10
 data <- arrange(teosinte_chr1, Position) 
 write.csv(data, paste("teosinte_inc_1",".csv",sep=""),row.names=F)
@@ -263,10 +251,10 @@ data <- arrange(teosinte_chr9, Position)
 write.csv(data, paste("teosinte_inc_9",".csv",sep=""),row.names=F)
 data <- arrange(teosinte_chr10, Position) 
 write.csv(data, paste("teosinte_inc_10",".csv",sep=""),row.names=F)
-```
+
 
 # Decreasing files- teosinte
-```{r}
+
 # Teosinte- 1 to 10
 data <- arrange(teosinte_chr1, desc(Position)) 
 data1 <- data.frame(sapply(data,function(x) {x <- gsub("?","-",x,fixed=TRUE)}))
@@ -308,10 +296,8 @@ data <- arrange(teosinte_chr10, desc(Position))
 data1 <- data.frame(sapply(data,function(x) {x <- gsub("?","-",x,fixed=TRUE)}))
 write.csv(data1, paste("teosinte_dec_10",".csv",sep=""),row.names=F)
 
-```
-
 # Organizing the increasing and decreasing files in a folder called teosinte
-```{r}
+
 # Create the teosinte folder
 if (!file.exists("teosinte")) {
   dir.create("teosinte")
@@ -322,12 +308,11 @@ for (i in 1:10) {
   file.rename(paste0("teosinte_inc_", i, ".csv"), paste0("teosinte/teosinte_inc_", i, ".csv"))
   file.rename(paste0("teosinte_dec_", i, ".csv"), paste0("teosinte/teosinte_dec_", i, ".csv"))
 }
-```
+
 
 
 # Organizing the Other files that were used for Part I in a folder called Other
 
-```{r}
 # Create the "Other" folder if it doesn't exist
 if (!file.exists("Other")) {
   dir.create("Other")
@@ -338,12 +323,11 @@ for (i in 1:10) {
   file.rename(paste0("maize_chr", i, ".csv"), paste0("Other/maize_chr", i, ".csv"))
   file.rename(paste0("teosinte_chr", i, ".csv"), paste0("Other/teosinte_chr", i, ".csv"))
 }
-```
 
 ## Part II Visualization
 
 # Data organization 
-```{r}
+
 # Transposing the fang file 
 t(fang) -> t_fang
 
@@ -356,10 +340,8 @@ fang_snp<- merge( snp_final, fang_final, by="SNP_ID", all=TRUE)
 # Visualize group distribution
 ggplot(fang, aes(Group)) + geom_bar()
 
-```
 
 # Data organization- part 2
-```{r}
 
 # Melting
 headers_names <- colnames(fang)[-c(1:3)]
@@ -394,7 +376,7 @@ count_group_melt <- melt(count_ID, measure.vars = c("count_homozygous", "count_h
 ```
 
 # Final Data visualization
-```{r}
+
 # Plot: Graph
 Graph<- ggplot(count_group_melt,aes(x = Sample_ID, y= value, fill=variable)) + geom_bar(stat = "identity", position ="stack")
 
@@ -437,10 +419,9 @@ Density_plot <- ggplot(fang_snp, aes(x = Position)) +
 
 ggsave("Density_plot.tiff", plot = Density_plot, device = "tiff", width = 8, height = 6, units = "in")
 
-```
 
 # Oganize the plots in a folder called plots
-```{r}
+
 # Create a folder named "plots" if it doesn't exist
 if (!file.exists("plots")) {
   dir.create("plots")
@@ -453,4 +434,4 @@ files_to_move <- c("Graph.tiff","Graph_proportion.tiff", "Snp_chromosome.tiff", 
 for (file in files_to_move) {
   file.rename(file, paste0("plots/", file))
 }
-```
+
