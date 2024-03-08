@@ -7,6 +7,8 @@ output: html_document
 
 ## R Assignment 2
 
+# The files created are organized in the folders: maize, teosinte and plots
+
 ## Part I: Data Inspection and Data Processing
 
 # Load packages
