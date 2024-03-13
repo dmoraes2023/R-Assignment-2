@@ -46,12 +46,12 @@ cat("Size of the file:", file_size_fang, "bytes\n")
 
 
 #For snp_position.txt file:
-```{r}
+
 snp <- read_tsv("./snp_position.txt")
 print(snp)
 
 ## Data Inspection
-here is my snippet of code used for data inspection:
+#here is my snippet of code used for data inspection:
   
  #
 head(snp)
@@ -61,12 +61,23 @@ dim(snp)
 # Get information about the file
 file_info <- file.info('snp_position.txt')
 
+#By inspecting this file (fang) I learned that:
+
+# The number of lines is 2782, and the columns is 986
+# The Size of the file: 11051939 bytes
+# There are multiple commands to understand the data as str, view, summary
+
 # Extract the size of the file
 file_size_snp <- file_info$size
 
 # Print the size of the file
 cat("Size of the file:", file_size_snp, "bytes\n")
-```
+
+#By inspecting this file (snp) I learned that:
+
+# The number of lines is 983, and the columns is 15
+# The Size of the file: 82763 bytes
+# There are multiple commands to understand the data as str, view, summary
 
 ## Data Processing
 #here is my snippet of code used for data processing:
@@ -90,7 +101,6 @@ snp_final <- select(snp, SNP_ID, Chromosome, Position)
 snp_sort <- arrange(snp_final, Position)
 maize <- filter(fang_et_al, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
 teosinte<- filter(fang_et_al, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
-
 
 # Organize and Transpose the data
 
@@ -309,8 +319,6 @@ for (i in 1:10) {
   file.rename(paste0("teosinte_dec_", i, ".csv"), paste0("teosinte/teosinte_dec_", i, ".csv"))
 }
 
-
-
 # Organizing the Other files that were used for Part I in a folder called Other
 
 # Create the "Other" folder if it doesn't exist
@@ -334,104 +342,97 @@ t(fang) -> t_fang
 # Organizing 
 fang_final <- data.frame(SNP_ID=rownames(t_fang), t_fang, row.names=NULL, check.names=FALSE)
 
-# Merging
-fang_snp<- merge( snp_final, fang_final, by="SNP_ID", all=TRUE)
+# Merging fang with snp
+fang_snp<- merge( fang_snp, fang_final, by="SNP_ID", all=TRUE)
 
-# Visualize group distribution
-ggplot(fang, aes(Group)) + geom_bar()
+# Visualization: SNPs per chromosome
 
+fang_snp$Chromosome <- factor(fang_snp$Chromosome, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "unknown", "multiple", "NA"))
+Graph_total<- ggplot(fang_snp,aes(x = Chromosome, fill=Chromosome)) + geom_bar(position ="stack")+
+  ggtitle(" Total SNPs per Chromosome")
+Graph_total
+ggsave("Graph_total.tiff", plot = Graph_total, device = "tiff", width = 8, height = 6, units = "in")
+
+maize_snp$Chromosome <- factor(maize_snp$Chromosome, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "unknown", "multiple", "NA"))
+Graph_maize<- ggplot(maize_snp,aes(x = Chromosome, fill=Chromosome)) + geom_bar(position ="stack")+
+  ggtitle("Maize SNPs per Chromosome")
+Graph_maize
+ggsave("Graph_maize.tiff", plot = Graph_maize, device = "tiff", width = 8, height = 6, units = "in")
+teosinte_snp$Chromosome <- factor(teosinte_snp$Chromosome, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "unknown", "multiple", "NA"))
+Graph_teosinte<- ggplot(teosinte_snp,aes(x = Chromosome, fill=Chromosome)) + geom_bar(position ="stack")+
+  ggtitle("Teosinte SNPs per Chromosome")
+Graph_teosinte
+ggsave("Graph_teosinte.tiff", plot = Graph_teosinte, device = "tiff", width = 8, height = 6, units = "in")
 
 # Data organization- part 2
+```{r}
+# Creating the groups
+fang_new <- fang %>%
+  mutate_if(is.character, str_replace_all, pattern = "A/A", replacement = "Homozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/T", replacement = "Homozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/G", replacement = "Homozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/C", replacement = "Homozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "A/T", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "A/G", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "A/C", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/A", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/G", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "T/C", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/A", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/T", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "G/C", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/A", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/T", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "C/G", replacement = "Heterozygous") %>%
+  mutate_if(is.character, str_replace_all, pattern = "\\?\\/?", replacement = "Missing")
 
-# Melting
-headers_names <- colnames(fang)[-c(1:3)]
-fang_melt <- melt(fang, measure.vars = headers_names)
+# Final Data visualization- Plotting the proportion heterozygous and homozygous
+```{r}
+#Subsetting SNP columns
+data <- colnames(fang_new)[-c(1:3)]
+data1 <- gather(fang_new, SNP, Genotype, data)
 
-# Creating subsets
-homozygous <- (fang_melt$value=="A/A" | fang_melt$value=="C/C" | fang_melt$value=="G/G" | fang_melt$value=="T/T" )
-#counting heterozygous
-hetero <- (fang_melt$value!="A/A" | fang_melt$value!="C/C" | fang_melt$value!= "G/G" | fang_melt$value!= "T/T" )
-missing <- (fang_melt$value=="?/?")
+# Plotting the proportion heterozygous and homozygous SNPs with missing data
+Proportion <- ggplot(data = data1, aes(x = Sample_ID, fill = Genotype)) + 
+  geom_bar(position = "fill") +
+  labs(x = "Sample ID", y = "Proportion") +
+  theme(axis.text.x = element_blank())+
+  ggtitle("Proportion heterozygous and homozygous SNPs with missing data")
+Proportion
+ggsave("Proportion.tiff", plot = Proportion, device = "tiff", width = 8, height = 6, units = "in")
 
-# Sorting
-fang_ID_sort<- arrange(fang_melt, Sample_ID)
+# Plotting the proportion heterozygous and homozygous SNPs with missing data by Groups
+Proportion_group <- ggplot(data = data1, aes(x = Group, fill = Genotype)) + 
+  geom_bar(position = "fill") +
+  labs(x = "Group", y = "Proportion") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels by 45 degrees
+  ggtitle("Proportion heterozygous and homozygous by Group")
+Proportion_group
+ggsave("Proportion_group.tiff", plot = Proportion_group, device = "tiff", width = 8, height = 6, units = "in")
 
-# Sorting
-fang_group_sort <- arrange(fang_melt, Group) 
+# My Own Graph: Distribution of SNP by group
 
-# Counting
-count_ID <- ddply(fang_ID_sort, c("Sample_ID"), summarise, count_homozygous=sum(homozygous, na.rm=TRUE), count_heterozygous=sum(!homozygous, na.rm=TRUE), isNA=sum(is.na(homozygous)))
-
-# Melting 
-count_ID_melt <- melt(count_ID, measure.vars = c("count_homozygous", "count_heterozygous", "isNA"))
-
-# Plotting 
-Plot_counting_SampleID <- ggplot(count_ID_melt,aes(x = Sample_ID, y= value, fill=variable)) + geom_bar(stat = "identity", position ="stack")
-Plot_counting_SampleID
-
-# Plotting for a grouped data
-count_group <- ddply(fang_group_sort, c("Sample_ID"), summarise, count_homozygous=sum(homozygous, na.rm=TRUE), count_heterozygous=sum(!homozygous, na.rm=TRUE), isNA=sum(is.na(homozygous)))
-
-count_group_melt <- melt(count_ID, measure.vars = c("count_homozygous", "count_heterozygous", "isNA"))
-```
-
-# Final Data visualization
-
-# Plot: Graph
-Graph<- ggplot(count_group_melt,aes(x = Sample_ID, y= value, fill=variable)) + geom_bar(stat = "identity", position ="stack")
-
-ggsave("Graph.tiff", plot = Graph, device = "tiff", width = 8, height = 6, units = "in")
-
-# Calculate proportions
-count_ID_melt <- count_ID_melt %>%
-  group_by(Sample_ID) %>%
-  mutate(total = sum(value),
-         proportion = value / total)
-
-# Now, plot the stacked bar chart with proportions
-Graph_proportion <- ggplot(count_ID_melt, aes(x = Sample_ID, y = proportion, fill = variable)) + 
-  geom_bar(stat = "identity", position = "fill") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(y = "Proportion", fill = "Category") 
-
-ggsave("Graph_proportion.tiff", plot = Graph_proportion, device = "tiff", width = 8, height = 6, units = "in")
-
-# Plot: SNP grouped by chromosome
-Snp_chromosome <- ggplot(fang_snp, aes (Chromosome, SNP_ID)) + geom_point(color = 'blue', size = 2) + theme(axis.text.y = element_blank())
-
-ggsave("Snp_chromosome.tiff", plot = Snp_chromosome, device = "tiff", width = 8, height = 6, units = "in")
-
-#Plot: Position and SNP
-Snp_position <- ggplot(fang_snp, aes (SNP_ID, Position)) + geom_point(color = 'red', size = 2) + theme(axis.text.y = element_blank())
-
-ggsave("Snp_position.tiff", plot = Snp_position, device = "tiff", width = 8, height = 6, units = "in")
-
-#Plot: Chromosomal distribution of the SNPs
-Chromosome_distribution <- ggplot(fang_snp, aes (Position, Chromosome)) + geom_point(color = 'green4', size = 2) + theme(axis.text.x = element_blank())
-
-ggsave("Chromosome_distribution.tiff", plot = Chromosome_distribution, device = "tiff", width = 8, height = 6, units = "in")
-
-# Plot: Density of SNP positions
-Density_plot <- ggplot(fang_snp, aes(x = Position)) +
-  geom_density(fill = 'skyblue', color = 'blue') +
-  labs(x = "Position", y = "Density", title = "Density of SNP Positions") +
-  theme_minimal()
-
-ggsave("Density_plot.tiff", plot = Density_plot, device = "tiff", width = 8, height = 6, units = "in")
-
+# Plot: Distribution of SNP 
+Distribution_SNP<- ggplot(data = data1, aes(x = Group)) +
+  geom_density(aes(fill = Genotype), alpha = 0.5) +
+  facet_wrap(~ Genotype)+
+  ggtitle(" Distribution of SNP by Group")
+Distribution_SNP
+ggsave("Distribution_SNP.tiff", plot = Distribution_SNP, device = "tiff", width = 8, height = 6, units = "in")
 
 # Oganize the plots in a folder called plots
-
+```{r}
 # Create a folder named "plots" if it doesn't exist
 if (!file.exists("plots")) {
   dir.create("plots")
 }
 
 # List of files to be moved
-files_to_move <- c("Graph.tiff","Graph_proportion.tiff", "Snp_chromosome.tiff", "Snp_position.tiff", "Chromosome_distribution.tiff", "Density_plot.tiff")
+files_to_move <- c("Graph_total.tiff","Graph_maize.tiff","Graph_teosinte.tiff","Proportion.tiff","Proportion_group.tiff","Distribution_SNP.tiff" )
 
 # Move each file to the "plots" folder
 for (file in files_to_move) {
   file.rename(file, paste0("plots/", file))
 }
+
 
