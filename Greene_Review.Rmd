@@ -1,0 +1,82 @@
+---
+title: "Greene_Review"
+author: "Russell Greene"
+date: "2024-03-18"
+output: html_document
+---
+
+# R_Assignment Review
+
+## Load Packages
+
+I don't have any comments on this section.
+
+## Importing Data
+
+I don't think you necessarily need to `print` the files. You could use `spec` or `View` if you want to analyze the format of the files. It might be worth indicating the data is tab delimited or use `show_col_types = False` to remove the error message that you get with the code.
+
+## Data Inspection
+
+I don't have anything to comment on this section. All the codes ran well.
+
+## Data Processing
+
+### Organize and Sort the Data
+
+The codes ran fine. I noticed you sorted the SNP data by position at this step, but you need to indicate that you want to sort it numerically and not as a character. You could just add this:
+
+```{r}
+snp_final <- select(snp, SNP_ID, Chromosome, Position) %>% 
+  mutate(Position = as.numeric(Position))
+snp_sort <- arrange(snp_final, Position)
+```
+
+Using this code will ensure all your sorting based on Position from here on out will be based on the numerical values and not the characters.
+
+### Organize and Transpose the Data
+
+It looks like you copy and pasted some of the codes from above into this section. I would just check for redundant codes and remove them.
+
+### Organize and Merge the Data
+
+Is there a reason you extract .csv files just to import them back in on the next code? I feel like there is a simpler way to do it by just treating them as data frames.
+
+I found it easier to arrange the maize data and teosinte data before extracting by chromosome:
+
+```{r}
+Asc_joined_maize_data <- joined_maize_data %>% 
+  mutate_all(~str_replace_all(., "\\?/\\?", "?")) %>% 
+  mutate(Position = as.numeric(Position)) %>% 
+  arrange(Position)
+```
+
+This will arrange in ascending order by position and replace the "?/?" with a single "?", which I think is what the assignment asks for.
+
+You can repeat this code for maize descending and teosinte ascending/descending just by changing a few things. This way, you only have 4 codes instead of 40.
+
+I like that you looped the chromosome extraction data and I think you can apply the same logic to the rest of your files so you don't have so many lines of code. Here is an example:
+
+```{r}
+for (i in 1:10) {
+  maize_data_asc_chr <- Asc_joined_maize_data %>% filter(Chromosome == i) 
+  assign(paste0("maize_data_asc_chr", i), maize_data_asc_chr)
+  file_path <- file.path('~/EEOB546_R_Lesson/R_Assignment', paste0("maize_asc_chr", i, ".csv"))
+  write.csv(maize_data_asc_chr, file = file_path, row.names = FALSE)
+}
+```
+
+This is a single code for extracting and writing .csv files for each chromosome.
+
+Although all the codes run well, I think it's worth condensing your codes using loops so it's not so difficult to work through.
+
+## Data Visualization
+
+### SNPs per Chromosome
+
+This plot looked good. I have no comment on it.
+
+### Heterozygous vs Homozygous
+
+Again, I think you can condense this code by using `if` `else` functions. You can assign the homozygous alleles and say all else are heterozygous instead of piping every single combination. 
+
+Other plots looked good. I have no more comments on it. 
