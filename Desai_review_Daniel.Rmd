@@ -1,0 +1,21 @@
+---
+title: "Desai_review_DanielMoraes"
+author: "Vedika Desai"
+date: "2024-03-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Review: 
+Here is the list of errors I was getting:- 
+1. Error in UseMethod("select") : 
+  no applicable method for 'select' applied to an object of class "character"
+I think the input here is not correct.
+
+Due to this , I could not run the further codes using "Run ALL" command. 
+
+I found rest of your codes well written. Summary for each well explained. Graphs look good. Well done!
+
