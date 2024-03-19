@@ -83,9 +83,9 @@ cat("Size of the file:", file_size_snp, "bytes\n")
 #here is my snippet of code used for data processing:
   
   # Organize and Sort the data
-  
- #
-snp_final <- select(snp, SNP_ID, Chromosome, Position)
+
+snp_final <- select(snp, SNP_ID, Chromosome, Position) %>% 
+  mutate(Position = as.numeric(Position))
 snp_sort <- arrange(snp_final, Position)
 maize <- filter(fang, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
 teosinte<- filter(fang, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
@@ -95,21 +95,9 @@ teosinte<- filter(fang, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
 # Transposing the files
 transpose_maize <- t(maize)
 transpose_teosinte <- t(teosinte)
-# Final data for maize and teosinte
-
-snp_final <- select(snp, SNP_ID, Chromosome, Position)
-snp_sort <- arrange(snp_final, Position)
-maize <- filter(fang_et_al, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
-teosinte<- filter(fang_et_al, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
 
 # Organize and Transpose the data
-
-#Rename the first column in SNP file to merge 
-rename(snp_sort, Sample_ID = SNP_ID) -> snp_f
-#Transposing the files
-transpose_maize <- t(maize)
-transpose_teosinte <- t(teosinte)
-#Final data for maize and teosinte
+# Final data for maize and teosinte
 maize_final<- data.frame(SNP_ID=rownames(transpose_maize), transpose_maize, row.names=NULL, check.names=FALSE)
 teosinte_final <- data.frame(SNP_ID=rownames(transpose_teosinte), transpose_teosinte, row.names=NULL, check.names=FALSE) 
 
