@@ -25,7 +25,7 @@ library(reshape2)
 ## Importing data
 #For fang_et_al_genotypes.txt file:
 fang <- read_tsv("./fang_et_al_genotypes.txt")
-print(fang)
+view(fang)
 
 ## Data Inspection
 # Here is my snippet of code used for data inspection:
@@ -48,7 +48,7 @@ cat("Size of the file:", file_size_fang, "bytes\n")
 #For snp_position.txt file:
 
 snp <- read_tsv("./snp_position.txt")
-print(snp)
+view(snp)
 
 ## Data Inspection
 #here is my snippet of code used for data inspection:
