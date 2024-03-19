@@ -89,7 +89,8 @@ here is my snippet of code used for data processing:
 # Organize and Sort the data
 
 ```{r}
-snp_final <- select(snp, SNP_ID, Chromosome, Position)
+snp_final <- select(snp, SNP_ID, Chromosome, Position) %>% 
+  mutate(Position = as.numeric(Position))
 snp_sort <- arrange(snp_final, Position)
 maize <- filter(fang, Group %in% c("ZMMIL", "ZMMLR", "ZMMMR"))
 teosinte<- filter(fang, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
